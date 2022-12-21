@@ -24,15 +24,16 @@ import TabTwoScreen from "../screens/TabTwoScreen"
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from "../types"
 import LinkingConfiguration from "./LinkingConfiguration"
 import LoginScreen from "../screens/auth/LoginScreen"
-import { Session } from "@supabase/supabase-js"
-import { supabase } from "../lib/supabase"
 import RegisterScreen from "../screens/auth/RegisterScreen"
+import useSession from "../hooks/useSession"
+import { useEffect } from "react"
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
-      theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      // theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+    >
       <RootNavigator />
     </NavigationContainer>
   )
@@ -45,36 +46,50 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
 function RootNavigator() {
-  const [session, setSession] = React.useState<Session | null>(null)
+  const { session } = useSession()
   const navigation = useNavigation()
-  React.useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-    if (!session?.user) {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Login" }],
-      })
+  const isAuth = !!session?.user
+
+  useEffect(() => {
+    const auth = () => {
+      if (session === null) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Login" }],
+        })
+      }
+    }
+
+    return () => {
+      auth()
     }
   }, [])
 
   return (
-    <Stack.Navigator initialRouteName={session && session.user ? "Login" : "Root"}>
-      {/* Auth */}
-      <Stack.Screen name="Login" component={LoginScreen} options={{ title: "Login" }} />
-      <Stack.Screen name="Register" component={RegisterScreen} options={{ title: "Register" }} />
+    <Stack.Navigator>
+      {!isAuth ? (
+        <>
+          <Stack.Screen name="Login" component={LoginScreen} options={{ title: "Login" }} />
+          <Stack.Screen
+            name="Register"
+            component={RegisterScreen}
+            options={{ title: "Register" }}
+          />
+        </>
+      ) : (
+        <>
+          <Stack.Screen
+            name="Root"
+            component={BottomTabNavigator}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: "Oops!" }} />
 
-      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
-      <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: "Oops!" }} />
-
-      {/* Modal */}
-      <Stack.Group screenOptions={{ presentation: "modal" }}>
-        <Stack.Screen name="Modal" component={ModalScreen} />
-      </Stack.Group>
+          <Stack.Group screenOptions={{ presentation: "modal" }}>
+            <Stack.Screen name="Modal" component={ModalScreen} />
+          </Stack.Group>
+        </>
+      )}
     </Stack.Navigator>
   )
 }

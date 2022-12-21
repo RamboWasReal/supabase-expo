@@ -5,25 +5,17 @@ import { RootTabScreenProps } from "../types"
 import React from "react"
 import { supabase } from "../lib/supabase"
 import { Session } from "@supabase/supabase-js"
+import useSession from "../hooks/useSession"
+import { tintColorDark, tintColorLight } from "../constants/Colors"
+import { Button } from "../components/Button"
 
 export default function TabOneScreen({ navigation }: RootTabScreenProps<"TabOne">) {
-  const [session, setSession] = React.useState<Session | null>(null)
-
-  React.useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
-  }, [])
-
+  const { session } = useSession()
 
   React.useEffect(() => {
     if (session) getProfile()
   }, [session])
 
-  
   async function getProfile() {
     try {
       if (!session?.user) throw new Error("No user on the session!")
@@ -44,14 +36,13 @@ export default function TabOneScreen({ navigation }: RootTabScreenProps<"TabOne"
       if (error instanceof Error) {
         Alert.alert(error.message)
       }
-    } finally {
-      console.log("finaly")
     }
   }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      <View style={styles.separator} lightColor={tintColorLight} darkColor={tintColorDark} />
+      <Button isLoading={false} onPress={() => supabase.auth.signOut()} title="Log Out" />
       <EditScreenInfo path="/screens/TabOneScreen.tsx" />
     </View>
   )
