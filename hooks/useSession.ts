@@ -1,9 +1,12 @@
 import React from "react"
 import { supabase } from "../lib/supabase"
 import { Session } from "@supabase/supabase-js"
+import { atom, useAtom } from "jotai"
+
+export const sessionAtom = atom<Session | null>(null)
 
 export default function useSession() {
-  const [session, setSession] = React.useState<Session | null>(null)
+  const [_, setSession] = useAtom(sessionAtom)
   React.useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
@@ -13,5 +16,5 @@ export default function useSession() {
     })
   }, [])
 
-  return { session }
+  return null
 }

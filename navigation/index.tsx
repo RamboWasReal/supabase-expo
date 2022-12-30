@@ -25,8 +25,10 @@ import { RootStackParamList, RootTabParamList, RootTabScreenProps } from "../typ
 import LinkingConfiguration from "./LinkingConfiguration"
 import LoginScreen from "../screens/auth/LoginScreen"
 import RegisterScreen from "../screens/auth/RegisterScreen"
-import useSession from "../hooks/useSession"
 import { useEffect } from "react"
+import { useAtomValue } from "jotai"
+import { sessionAtom } from "../hooks/useSession"
+import CustomSplashScreen from "../screens/CustomSplashScreen"
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -46,9 +48,8 @@ export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeNa
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
 function RootNavigator() {
-  const { session } = useSession()
+  const session = useAtomValue(sessionAtom)
   const navigation = useNavigation()
-  const isAuth = !!session?.user
 
   useEffect(() => {
     const auth = () => {
@@ -63,33 +64,23 @@ function RootNavigator() {
     return () => {
       auth()
     }
-  }, [])
+  }, [session])
 
   return (
-    <Stack.Navigator>
-      {!isAuth ? (
-        <>
-          <Stack.Screen name="Login" component={LoginScreen} options={{ title: "Login" }} />
-          <Stack.Screen
-            name="Register"
-            component={RegisterScreen}
-            options={{ title: "Register" }}
-          />
-        </>
-      ) : (
-        <>
-          <Stack.Screen
-            name="Root"
-            component={BottomTabNavigator}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: "Oops!" }} />
+    <Stack.Navigator initialRouteName="SplashScreen">
+      <Stack.Screen name="Root" component={BottomTabNavigator} options={{ headerShown: false }} />
+      <Stack.Screen
+        name="SplashScreen"
+        component={CustomSplashScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="Login" component={LoginScreen} options={{ title: "Login" }} />
+      <Stack.Screen name="Register" component={RegisterScreen} options={{ title: "Register" }} />
+      <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: "Oops!" }} />
 
-          <Stack.Group screenOptions={{ presentation: "modal" }}>
-            <Stack.Screen name="Modal" component={ModalScreen} />
-          </Stack.Group>
-        </>
-      )}
+      <Stack.Group screenOptions={{ presentation: "modal" }}>
+        <Stack.Screen name="Modal" component={ModalScreen} />
+      </Stack.Group>
     </Stack.Navigator>
   )
 }
@@ -136,6 +127,14 @@ function BottomTabNavigator() {
         component={TabTwoScreen}
         options={{
           title: "Tab Two",
+          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+        }}
+      />
+      <BottomTab.Screen
+        name="Settings"
+        component={TabTwoScreen}
+        options={{
+          title: "Settings",
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
       />

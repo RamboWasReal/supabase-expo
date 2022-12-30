@@ -25,7 +25,6 @@ export default function LoginScreen() {
       password: "",
     },
   })
-
   const onSubmit = async (data: LogInField) => {
     const { error } = await supabase.auth.signInWithPassword({
       email: data.email,
@@ -40,90 +39,73 @@ export default function LoginScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <View style={{ flex: 1 }}>
-          <Image
-            source={{
-              uri: "https://images.unsplash.com/photo-1432821596592-e2c18b78144f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2970&q=80",
-            }}
-            resizeMode="contain"
-            style={{
-              height: 300,
-              width: "100%",
-            }}
-          />
-        </View>
-        <View style={{ marginHorizontal: 15, marginTop: 15 }}>
-          <Controller
-            control={control}
-            rules={{
-              required: true,
-            }}
-            render={({ field: { onChange, onBlur, value } }) => (
-              <>
-                <View style={{ paddingBottom: 5 }}>
-                  <Text>Email</Text>
-                </View>
-                <TextInput
-                  style={styles.input}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  value={value}
-                  autoCapitalize="none"
-                />
-              </>
-            )}
-            name="email"
-          />
-          {errors.email && <Text style={{ color: "red" }}>This is required.</Text>}
-          <View style={{ marginTop: 20 }}>
-            <Controller
-              control={control}
-              rules={{
-                required: true,
-              }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <>
-                  <View style={{ paddingBottom: 5 }}>
-                    <Text>Password</Text>
-                  </View>
-                  <TextInput
-                    style={styles.input}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    autoCapitalize="none"
-                    secureTextEntry
-                  />
-                </>
-              )}
-              name="password"
+    <View style={styles.container}>
+      <View style={{ position: 'absolute', top: 70 }}>
+        <Image source={{ uri: "https://purepng.com/public/uploads/large/purepng.com-batman-logobatmansuperherocomicdc-comicsbob-kanebat-manbruce-wayne-1701528523452unulm.png" }}
+          style={{ width: 200, height: 100 }} />
+      </View>
+      <Controller
+        control={control}
+        rules={{
+          required: true,
+        }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <>
+            <View style={{ paddingBottom: 5 }}>
+              <Text>Email</Text>
+            </View>
+            <TextInput
+              style={styles.input}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              autoCapitalize="none"
             />
-            {errors.password && <Text style={{ color: "red" }}>This is required.</Text>}
-          </View>
-          <View style={{ marginHorizontal: 40 }}>
-            <View style={{ marginTop: 30 }}>
-              <Button isLoading={isSubmitting} onPress={handleSubmit(onSubmit)} title="Log in" />
+          </>
+        )}
+        name="email"
+      />
+      {errors.email && <Text style={{ color: "red" }}>This is required.</Text>}
+      <Controller
+        control={control}
+        rules={{
+          required: true,
+        }}
+        render={({ field: { onChange, onBlur, value } }) => (
+          <>
+            <View style={{ marginTop: 5, paddingBottom: 5 }}>
+              <Text>Password</Text>
             </View>
-            <View style={{ marginTop: 20 }}>
-              <Button
-                isLoading={isSubmitting}
-                bgColor={tintColorDark}
-                color={tintColorLight}
-                onPress={() =>
-                  navigation.reset({
-                    index: 0,
-                    routes: [{ name: "Register" }],
-                  })
-                }
-                title="Sign up"
-              />
-            </View>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+            <TextInput
+              style={styles.input}
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              autoCapitalize="none"
+              secureTextEntry
+            />
+          </>
+        )}
+        name="password"
+      />
+      {errors.password && <Text style={{ color: "red" }}>This is required.</Text>}
+      <View style={{ marginTop: 30, paddingHorizontal: 55, width: '100%' }}>
+        <Button isLoading={isSubmitting} onPress={handleSubmit(onSubmit)} title="Log in" />
+      </View>
+      <View style={{ marginTop: 20, paddingHorizontal: 55, width: '100%' }}>
+        <Button
+          bgColor={tintColorDark}
+          color={tintColorLight}
+          onPress={() =>
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "Register" }],
+            })
+          }
+          title="Sign up"
+        />
+      </View>
+    </View>
   )
 }
 
@@ -131,6 +113,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
+    justifyContent: 'center',
+    alignItems: "center",
+    position: 'relative'
   },
   input: {
     borderColor: "#d2c9bc",
@@ -140,5 +125,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     color: "black",
     height: 40,
+    width: 400,
   },
 })

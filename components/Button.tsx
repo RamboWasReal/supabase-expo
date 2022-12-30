@@ -1,7 +1,7 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, ViewStyle } from "react-native"
 
 interface Props {
-  isLoading: boolean
+  isLoading?: boolean
   onPress: () => void
   style?: ViewStyle
   size?: number
@@ -42,5 +42,6 @@ const styles = StyleSheet.create({
     padding: 15,
     justifyContent: "center",
     alignItems: "center",
+    width: '100%'
   },
 })
